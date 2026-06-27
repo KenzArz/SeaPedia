@@ -1,0 +1,24 @@
+<svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+  <!-- Layer 1: Wide horizontal waves (Enhanced Opacity for visibility) -->
+  <path d="M-100,180 C120,80 300,300 520,180 C740,60 920,280 1140,160 C1320,60 1420,200 1540,140" fill="none" stroke="#2563EB" stroke-width="2.2" opacity="0.22"/>
+  <path d="M-100,240 C130,140 310,360 540,240 C770,120 950,340 1180,220 C1340,130 1430,250 1540,200" fill="none" stroke="#3B82F6" stroke-width="1.8" opacity="0.18"/>
+  <path d="M-100,310 C140,210 330,420 570,310 C810,200 990,400 1220,290 C1370,210 1440,310 1540,270" fill="none" stroke="#60A5FA" stroke-width="2.5" opacity="0.20"/>
+  <path d="M-100,390 C160,290 360,490 600,380 C840,270 1030,470 1260,360 C1390,290 1450,380 1540,340" fill="none" stroke="#1D4ED8" stroke-width="1.8" opacity="0.16"/>
+  <path d="M-100,460 C180,360 380,560 630,450 C880,340 1060,540 1300,430 C1410,365 1460,450 1540,415" fill="none" stroke="#3B82F6" stroke-width="2.0" opacity="0.24"/>
+  <path d="M-100,540 C190,440 400,620 660,520 C920,420 1100,600 1360,500 C1430,455 1470,515 1540,490" fill="none" stroke="#2563EB" stroke-width="1.5" opacity="0.15"/>
+  <path d="M-100,620 C200,520 420,700 690,590 C960,480 1140,680 1380,580 C1445,540 1480,590 1540,565" fill="none" stroke="#60A5FA" stroke-width="2.2" opacity="0.18"/>
+  <path d="M-100,700 C220,610 440,770 720,670 C1000,570 1180,750 1400,660 C1455,630 1485,668 1540,648" fill="none" stroke="#1D4ED8" stroke-width="1.6" opacity="0.15"/>
+
+  <!-- Layer 2: Accent waves upper -->
+  <path d="M-100,80 C200,-20 440,180 700,80 C960,-20 1180,160 1440,50" fill="none" stroke="#93C5FD" stroke-width="2.8" opacity="0.25"/>
+  <path d="M-100,130 C210,30 450,220 710,130 C970,40 1190,200 1440,100" fill="none" stroke="#60A5FA" stroke-width="1.5" opacity="0.16"/>
+
+  <!-- Layer 3: Bottom decorative waves -->
+  <path d="M-100,760 C240,680 460,820 740,740 C1020,660 1220,800 1480,720 C1510,710 1530,720 1540,718" fill="none" stroke="#3B82F6" stroke-width="2.0" opacity="0.16"/>
+  <path d="M-100,840 C260,760 480,880 760,810 C1040,740 1240,860 1500,790" fill="none" stroke="#1D4ED8" stroke-width="1.5" opacity="0.18"/>
+
+  <!-- Decorative blobs/circles -->
+  <circle cx="80" cy="120" r="180" fill="#2563EB" opacity="0.04"/>
+  <circle cx="1360" cy="780" r="220" fill="#3B82F6" opacity="0.05"/>
+  <circle cx="720" cy="450" r="300" fill="#60A5FA" opacity="0.03"/>
+</svg>

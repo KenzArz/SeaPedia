@@ -1,0 +1,219 @@
+:root {
+  /* ── Primary Brand (Deep Indigo) ── */
+  --primary: #4f46e5;
+  --primary-hover: #3730a3;
+  --primary-light: #eef2ff;
+  --primary-rgb: 79, 70, 229;
+
+  /* ── Role Accent Colors ── */
+  --buyer-color: #0d9488;
+  --buyer-light: #f0fdfa;
+  --seller-color: #f97316;
+  --seller-light: #fff7ed;
+  --driver-color: #d97706;
+  --driver-light: #fef3c7;
+  --admin-color: #e11d48;
+  --admin-light: #fff1f2;
+
+  /* ── Surface Palette ── */
+  --bg-app: #ffffff;
+  --bg-surface: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-dark: #08090a;
+  --bg-dark-card: #141618;
+  --bg-dark-surface: #1c1e20;
+
+  /* ── Text Scale ── */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --text-on-dark: #f1f5f9;
+  --text-on-dark-muted: #94a3b8;
+  --text-on-primary: #ffffff;
+
+  /* ── Borders ── */
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+
+  /* ── Shadows ── */
+  --shadow-xs: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.07);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.08);
+  --shadow-lg: 0 20px 48px rgba(0,0,0,0.1);
+  --shadow-glow: 0 0 40px rgba(79, 70, 229, 0.15);
+
+  /* ── Radii ── */
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-pill: 9999px;
+
+  /* ── Typography Scale ── */
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-md: 17px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+  --text-2xl: 32px;
+  --text-3xl: 42px;
+  --text-4xl: 56px;
+  --text-5xl: 72px;
+
+  /* ── Spacing ── */
+  --section-py: 110px;
+  --section-py-md: 72px;
+
+  /* ── Transitions ── */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --t-fast: 0.15s;
+  --t-base: 0.22s;
+  --t-slow: 0.4s;
+
+  /* ── Legacy aliases (backward compat) ── */
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --bg-card-legacy: var(--bg-card);
+  --slate-border: var(--border);
+  --slate-light: var(--bg-surface);
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-xl);
+  --transition-smooth: var(--t-base) var(--ease);
+}
+
+/* Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  font-size: var(--text-base);
+  background-color: #ffffff;
+  color: #0f0f0f;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+}
+
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+img { max-width: 100%; height: auto; display: block; }
+
+/* ── Scrollbar ──────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ── Utility classes ─────────────────────────────── */
+.app-layout { min-height: 100vh; display: flex; flex-direction: column; position: relative; }
+.main-content-layout { flex: 1; width: 100%; }
+.w-full { width: 100% !important; }
+.flex-1 { flex: 1; }
+.text-primary { color: var(--primary) !important; }
+
+/* ── Global Wave Background ──────────────────────── */
+/* Fixed so it stays visible across ALL pages and all scroll positions */
+.wave-bg-global {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 1;
+}
+
+
+/* ── Alerts ──────────────────────────────────────── */
+.alert {
+  padding: 12px 16px;
+  border-radius: var(--r-sm);
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.alert-error { background: #fef2f2; color: #991b1b; border: 1px solid #fee2e2; }
+.alert-success { background: #f0fdf4; color: #166534; border: 1px solid #dcfce7; }
+.alert-info-compact {
+  background: var(--primary-light);
+  color: var(--primary);
+  border: 1px solid rgba(79,70,229,0.15);
+  font-size: 14px;
+  padding: 12px 16px;
+  border-radius: var(--r-sm);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.alert-info-compact svg { margin-top: 2px; flex-shrink: 0; }
+
+/* ── Spinner ─────────────────────────────────────── */
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border);
+  border-bottom-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-container {
+  min-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  gap: 14px;
+}
+
+/* ── Entrance Animations ─────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.anim-fade-up          { animation: fadeInUp 0.6s var(--ease-out) both; }
+.anim-fade-up-d1       { animation: fadeInUp 0.6s 0.1s var(--ease-out) both; }
+.anim-fade-up-d2       { animation: fadeInUp 0.6s 0.2s var(--ease-out) both; }
+.anim-fade-up-d3       { animation: fadeInUp 0.6s 0.3s var(--ease-out) both; }
+.anim-fade-up-d4       { animation: fadeInUp 0.6s 0.4s var(--ease-out) both; }
+.anim-fade             { animation: fadeIn 0.6s var(--ease-out) both; }
+.anim-scale            { animation: scaleIn 0.5s var(--ease-spring) both; }

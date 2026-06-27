@@ -1,0 +1,239 @@
+.pdp-page {
+  padding: 48px 24px;
+}
+.pdp-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.pdp-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 32px;
+  font-size: var(--text-sm);
+}
+.breadcrumb-link {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.breadcrumb-link:hover {
+  color: var(--primary);
+}
+.breadcrumb-sep {
+  color: var(--text-muted);
+}
+.breadcrumb-current {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.pdp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 64px;
+  align-items: start;
+}
+@media (max-width: 800px) {
+  .pdp-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+.pdp-img-container {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 24px;
+}
+.pdp-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.pdp-category-overlay {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background-color: rgba(0,0,0,0.75);
+  color: white;
+  padding: 4px 12px;
+  border-radius: var(--r-pill);
+  font-size: var(--text-xs);
+  font-weight: 700;
+}
+.pdp-store-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-radius: var(--r-md);
+  background-color: var(--bg-surface);
+}
+.pdp-store-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-sm);
+  background-color: var(--primary-light);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pdp-store-lbl {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-weight: 600;
+  display: block;
+}
+.pdp-store-name {
+  font-size: var(--text-base);
+  font-weight: 700;
+}
+.pdp-category-lbl {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--primary);
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  display: block;
+}
+.pdp-title {
+  font-size: var(--text-3xl);
+  margin-bottom: 24px;
+}
+.pdp-price-container {
+  margin-bottom: 24px;
+}
+.pdp-price-lbl {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-weight: 600;
+  display: block;
+  margin-bottom: 4px;
+}
+.pdp-price-val {
+  font-size: var(--text-4xl);
+  font-weight: 900;
+  color: var(--seller-color);
+}
+.pdp-price-unit {
+  font-size: var(--text-lg);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.pdp-stock-indicator-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  margin-bottom: 32px;
+}
+.pdp-stock-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.pdp-stock-dot--high { background-color: var(--buyer-color); }
+.pdp-stock-dot--medium { background-color: var(--driver-color); }
+.pdp-stock-dot--low { background-color: var(--admin-color); }
+.pdp-desc-container {
+  margin-bottom: 32px;
+}
+.pdp-desc-container h3 {
+  font-size: var(--text-base);
+  margin-bottom: 8px;
+}
+.pdp-desc-container p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.pdp-purchase-container {
+  margin-bottom: 24px;
+}
+.pdp-guest-notice {
+  background-color: var(--bg-surface);
+  padding: 24px;
+  border-radius: var(--r-md);
+  text-align: center;
+}
+.pdp-guest-notice p {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+.pdp-guest-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.btn-pdp-login {
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+  padding: 10px 20px;
+  border-radius: var(--r-sm);
+  font-weight: 600;
+}
+.btn-pdp-register {
+  background-color: var(--primary);
+  color: white;
+  padding: 10px 20px;
+  border-radius: var(--r-sm);
+  font-weight: 700;
+}
+.btn-pdp-cart-disabled {
+  width: 100%;
+  background-color: var(--border-strong);
+  color: var(--text-muted);
+  padding: 14px;
+  border-radius: var(--r-sm);
+  font-weight: 700;
+  cursor: not-allowed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.pdp-wrong-role {
+  background-color: var(--admin-light);
+  color: var(--admin-color);
+  padding: 16px;
+  border-radius: var(--r-md);
+  font-size: var(--text-sm);
+  display: flex;
+  gap: 12px;
+}
+.pdp-buyer-action {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.pdp-trust-seal {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.pdp-trust-icon {
+  color: var(--buyer-color);
+}
+.pdp-not-found {
+  text-align: center;
+  padding: 80px 24px;
+}
+.pdp-nf-icon {
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.btn-pdp-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 24px;
+  color: var(--primary);
+  font-weight: 700;
+}
