@@ -1,13 +1,33 @@
 import mongoose from 'mongoose';
 import fs from 'fs';
 import path from 'path';
+import Store from './models/Store.js';
+import Product from './models/Product.js';
 
 const localDbPath = path.resolve('local_db.json');
 
 // Ensure local JSON DB file exists
 const initializeLocalDb = () => {
   if (!fs.existsSync(localDbPath)) {
-    fs.writeFileSync(localDbPath, JSON.stringify({ users: [], reviews: [] }, null, 2), 'utf-8');
+    fs.writeFileSync(localDbPath, JSON.stringify({ users: [], reviews: [], stores: [], products: [] }, null, 2), 'utf-8');
+  } else {
+    try {
+      const data = JSON.parse(fs.readFileSync(localDbPath, 'utf-8'));
+      let changed = false;
+      if (!data.stores) {
+        data.stores = [];
+        changed = true;
+      }
+      if (!data.products) {
+        data.products = [];
+        changed = true;
+      }
+      if (changed) {
+        fs.writeFileSync(localDbPath, JSON.stringify(data, null, 2), 'utf-8');
+      }
+    } catch (err) {
+      // Ignore
+    }
   }
 };
 
@@ -16,9 +36,15 @@ initializeLocalDb();
 const readLocalDb = () => {
   try {
     const data = fs.readFileSync(localDbPath, 'utf-8');
-    return JSON.parse(data);
+    const parsed = JSON.parse(data);
+    return {
+      users: parsed.users || [],
+      reviews: parsed.reviews || [],
+      stores: parsed.stores || [],
+      products: parsed.products || []
+    };
   } catch (err) {
-    return { users: [], reviews: [] };
+    return { users: [], reviews: [], stores: [], products: [] };
   }
 };
 
@@ -137,6 +163,236 @@ export const db = {
         localData.reviews.push(newReview);
         writeLocalDb(localData);
         return newReview;
+      }
+    }
+  },
+  Store: {
+    findOne: async (query) => {
+      if (!useLocalDb) {
+        return await Store.findOne(query).populate('owner', 'username');
+      } else {
+        const localData = readLocalDb();
+        const store = localData.stores.find(s => {
+          return Object.keys(query).every(key => s[key] === query[key]);
+        });
+        if (!store) return null;
+        const user = localData.users.find(u => u._id === store.owner);
+        return {
+          ...store,
+          owner: user ? { _id: user._id, username: user.username } : null
+        };
+      }
+    },
+    create: async (storeData) => {
+      if (!useLocalDb) {
+        return await Store.create(storeData);
+      } else {
+        const localData = readLocalDb();
+        const newStore = {
+          _id: Math.random().toString(36).substring(2, 9),
+          createdAt: new Date().toISOString(),
+          ...storeData
+        };
+        // Enforce uniqueness of name and owner
+        if (localData.stores.some(s => s.name === storeData.name)) {
+          const err = new Error('Nama toko sudah digunakan');
+          err.code = 11000;
+          throw err;
+        }
+        if (localData.stores.some(s => s.owner === storeData.owner)) {
+          const err = new Error('Kamu sudah memiliki toko');
+          err.code = 11000;
+          throw err;
+        }
+        localData.stores.push(newStore);
+        writeLocalDb(localData);
+        return newStore;
+      }
+    },
+    findOneAndUpdate: async (query, updateData) => {
+      if (!useLocalDb) {
+        return await Store.findOneAndUpdate(query, updateData, { new: true }).populate('owner', 'username');
+      } else {
+        const localData = readLocalDb();
+        const storeIndex = localData.stores.findIndex(s => {
+          return Object.keys(query).every(key => s[key] === query[key]);
+        });
+        if (storeIndex === -1) return null;
+        
+        // Enforce uniqueness of name if it's being updated
+        if (updateData.name && updateData.name !== localData.stores[storeIndex].name) {
+          if (localData.stores.some(s => s.name === updateData.name)) {
+            const err = new Error('Nama toko sudah digunakan');
+            err.code = 11000;
+            throw err;
+          }
+        }
+        
+        localData.stores[storeIndex] = {
+          ...localData.stores[storeIndex],
+          ...updateData
+        };
+        writeLocalDb(localData);
+        
+        const store = localData.stores[storeIndex];
+        const user = localData.users.find(u => u._id === store.owner);
+        return {
+          ...store,
+          owner: user ? { _id: user._id, username: user.username } : null
+        };
+      }
+    },
+    findById: async (id) => {
+      if (!useLocalDb) {
+        return await Store.findById(id).populate('owner', 'username');
+      } else {
+        const localData = readLocalDb();
+        const store = localData.stores.find(s => s._id === id);
+        if (!store) return null;
+        const user = localData.users.find(u => u._id === store.owner);
+        return {
+          ...store,
+          owner: user ? { _id: user._id, username: user.username } : null
+        };
+      }
+    }
+  },
+  Product: {
+    find: async (query) => {
+      if (!useLocalDb) {
+        return await Product.find(query).populate('store', 'name description').populate('owner', 'username').sort({ createdAt: -1 });
+      } else {
+        const localData = readLocalDb();
+        let results = localData.products.filter(p => {
+          return Object.keys(query).every(key => p[key] === query[key]);
+        });
+        
+        results.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        return results.map(p => {
+          const store = localData.stores.find(s => s._id === p.store);
+          const user = localData.users.find(u => u._id === p.owner);
+          return {
+            ...p,
+            store: store ? { _id: store._id, name: store.name, description: store.description } : null,
+            owner: user ? { _id: user._id, username: user.username } : null
+          };
+        });
+      }
+    },
+    findWithPagination: async (query, { search, page = 1, limit = 20 }) => {
+      if (!useLocalDb) {
+        const mQuery = { ...query };
+        if (search) {
+          mQuery.name = { $regex: search, $options: 'i' };
+        }
+        const total = await Product.countDocuments(mQuery);
+        const products = await Product.find(mQuery)
+          .populate('store', 'name description')
+          .populate('owner', 'username')
+          .sort({ createdAt: -1 })
+          .skip((page - 1) * limit)
+          .limit(limit);
+        return { products, total, page, totalPages: Math.ceil(total / limit) };
+      } else {
+        const localData = readLocalDb();
+        let results = localData.products.filter(p => {
+          return Object.keys(query).every(key => p[key] === query[key]);
+        });
+        
+        if (search) {
+          const keyword = search.toLowerCase();
+          results = results.filter(p => p.name.toLowerCase().includes(keyword));
+        }
+        
+        results.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        const total = results.length;
+        const startIdx = (page - 1) * limit;
+        const paginated = results.slice(startIdx, startIdx + limit);
+        
+        const populated = paginated.map(p => {
+          const store = localData.stores.find(s => s._id === p.store);
+          const user = localData.users.find(u => u._id === p.owner);
+          return {
+            ...p,
+            store: store ? { _id: store._id, name: store.name, description: store.description } : null,
+            owner: user ? { _id: user._id, username: user.username } : null
+          };
+        });
+        
+        return { products: populated, total, page, totalPages: Math.ceil(total / limit) };
+      }
+    },
+    findById: async (id) => {
+      if (!useLocalDb) {
+        return await Product.findById(id)
+          .populate('store', 'name description owner')
+          .populate('owner', 'username');
+      } else {
+        const localData = readLocalDb();
+        const product = localData.products.find(p => p._id === id);
+        if (!product) return null;
+        const store = localData.stores.find(s => s._id === product.store);
+        const user = localData.users.find(u => u._id === product.owner);
+        
+        let populatedStore = null;
+        if (store) {
+          const storeOwner = localData.users.find(u => u._id === store.owner);
+          populatedStore = {
+            _id: store._id,
+            name: store.name,
+            description: store.description,
+            owner: storeOwner ? { _id: storeOwner._id, username: storeOwner.username } : store.owner
+          };
+        }
+        
+        return {
+          ...product,
+          store: populatedStore,
+          owner: user ? { _id: user._id, username: user.username } : null
+        };
+      }
+    },
+    create: async (productData) => {
+      if (!useLocalDb) {
+        return await Product.create(productData);
+      } else {
+        const localData = readLocalDb();
+        const newProduct = {
+          _id: Math.random().toString(36).substring(2, 9),
+          isActive: true,
+          createdAt: new Date().toISOString(),
+          ...productData
+        };
+        localData.products.push(newProduct);
+        writeLocalDb(localData);
+        return newProduct;
+      }
+    },
+    findByIdAndUpdate: async (id, updateData) => {
+      if (!useLocalDb) {
+        return await Product.findByIdAndUpdate(id, updateData, { new: true });
+      } else {
+        const localData = readLocalDb();
+        const idx = localData.products.findIndex(p => p._id === id);
+        if (idx === -1) return null;
+        localData.products[idx] = {
+          ...localData.products[idx],
+          ...updateData
+        };
+        writeLocalDb(localData);
+        return localData.products[idx];
+      }
+    },
+    countDocuments: async (query) => {
+      if (!useLocalDb) {
+        return await Product.countDocuments(query);
+      } else {
+        const localData = readLocalDb();
+        return localData.products.filter(p => {
+          return Object.keys(query).every(key => p[key] === query[key]);
+        }).length;
       }
     }
   }

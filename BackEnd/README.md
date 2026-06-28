@@ -1,6 +1,6 @@
 # Seapedia — BackEnd API
 
-Dokumentasi ini menjelaskan arsitektur, cara instalasi, dan daftar endpoint API untuk bagian **BackEnd** dari proyek Seapedia.
+Dokumentasi ini menjelaskan cara instalasi, dan daftar endpoint API untuk bagian **BackEnd** dari proyek Seapedia.
 
 ---
 

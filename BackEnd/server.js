@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import { connectDB } from './db.js';
 import authRoutes from './routes/auth.js';
 import reviewRoutes from './routes/reviews.js';
+import storeRoutes from './routes/stores.js';
+import productRoutes from './routes/products.js';
 
 dotenv.config();
 
@@ -21,6 +23,8 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/stores', storeRoutes);
+app.use('/api/products', productRoutes);
 
 app.get('/', (req, res) => {
   res.send('API Seapedia berjalan lancar!');
