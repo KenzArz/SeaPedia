@@ -1,30 +1,47 @@
-# Seapedia
+# SEAPEDIA
 
-Selamat datang di repositori **Seapedia**! Seapedia adalah platform digital/marketplace yang memfasilitasi pencarian dan transaksi produk hasil laut langsung dari nelayan atau penjual lokal.
+SEAPEDIA adalah platform e-commerce multi-peran yang menghubungkan Penjual, Pembeli, dan Pengemudi dalam satu ekosistem digital yang transparan. Proyek ini dikembangkan sebagai bagian dari Technical Challenge COMPFEST 18 Academy — Software Engineering Track.
 
-Proyek ini dibangun dengan arsitektur monorepo sederhana yang terbagi menjadi dua bagian utama: **FrontEnd** dan **BackEnd**.
-
----
-
-## 📁 Struktur Proyek
-
-Repositori ini terbagi menjadi folder-folder berikut:
-
-1.  **[FrontEnd](./FrontEnd)**: Aplikasi antarmuka pengguna (web client) yang dibangun menggunakan React, TypeScript, dan bundler Vite.
-    *   *Dokumentasi lengkap:* Silakan baca [FrontEnd README](./FrontEnd/README.md).
-2.  **[BackEnd](./BackEnd)**: Layanan API server berbasis Express.js yang bertugas menangani autentikasi JWT, manajemen peran (roles), dan data ulasan.
-    *   *Mekanisme Cerdas:* Dilengkapi fitur *Automatic Database Fallback* ke local JSON file jika MongoDB tidak terdeteksi, sehingga dapat langsung dijalankan tanpa setup database yang rumit.
-    *   *Dokumentasi lengkap:* Silakan baca [BackEnd README](./BackEnd/README.md).
+Implementasi saat ini mencakup **Level 1** dan **Level 2** dari total 7 level yang didefinisikan pada spesifikasi tantangan.
 
 ---
 
-## 🚀 Panduan Memulai Cepat (Quick Start)
+## Tingkat Implementasi
 
-Ikuti langkah di bawah ini untuk menjalankan aplikasi secara lokal di komputer Anda. Pastikan Anda telah menginstal [Node.js](https://nodejs.org/) dan package manager [pnpm](https://pnpm.io/) (atau `npm`).
+| Level | Fitur | Status |
+|-------|-------|--------|
+| 1 | Public Marketplace, Autentikasi, Ulasan Aplikasi | Selesai |
+| 2 | Pengalaman Penjual, Manajemen Produk, Katalog Publik | Selesai |
+| 3 | Wallet Pembeli, Keranjang, dan Checkout | Belum diimplementasikan |
+| 4 | Diskon dan Pemrosesan Pesanan Penjual | Belum diimplementasikan |
+| 5 | Pengiriman dan Alur Kerja Pengemudi | Belum diimplementasikan |
+| 6 | Monitoring Admin dan Penanganan Keterlambatan | Belum diimplementasikan |
+| 7 | Penguatan Keamanan dan Finalisasi | Belum diimplementasikan |
 
-### 1. Menjalankan BackEnd API
+---
 
-Buka terminal baru di root folder proyek:
+## Struktur Repositori
+
+```
+Seapedia/
+├── BackEnd/        Backend API berbasis Express.js
+├── FrontEnd/       Frontend berbasis React + TypeScript + Vite
+└── README.md       Dokumentasi ini
+```
+
+---
+
+## Persyaratan Sistem
+
+- Node.js versi 18 atau lebih baru
+- pnpm (disarankan) atau npm
+- MongoDB (opsional — sistem secara otomatis beralih ke JSON fallback jika tidak tersedia)
+
+---
+
+## Cara Menjalankan Aplikasi
+
+### 1. Backend
 
 ```bash
 cd BackEnd
@@ -32,12 +49,9 @@ pnpm install
 pnpm dev
 ```
 
-*   Server BackEnd secara default akan berjalan di **http://localhost:5000**.
-*   Database lokal `local_db.json` akan otomatis dibuat jika koneksi ke MongoDB gagal/tidak diaktifkan.
+Server akan berjalan pada `http://localhost:5000`.
 
-### 2. Menjalankan FrontEnd Client
-
-Buka terminal baru lainnya di root folder proyek:
+### 2. Frontend
 
 ```bash
 cd FrontEnd
@@ -45,16 +59,45 @@ pnpm install
 pnpm dev
 ```
 
-*   Aplikasi FrontEnd akan berjalan di **http://localhost:5173**.
-*   Buka peramban (browser) Anda dan akses alamat tersebut untuk berinteraksi dengan Seapedia.
+Aplikasi akan berjalan pada `http://localhost:5173`.
+
+### 3. Urutan Menjalankan
+
+Backend harus dijalankan terlebih dahulu sebelum frontend. Jika MongoDB tidak tersedia, backend akan secara otomatis beralih ke mode penyimpanan JSON lokal (`local_db.json`) tanpa konfigurasi tambahan.
 
 ---
 
-## 🛠️ Ringkasan Teknologi
+## Aturan Bisnis Utama
 
-| Layer | Komponen / Library Utama |
-|---|---|
-| **FrontEnd** | React.js, TypeScript, Vite, React Router DOM, Vanilla CSS / Tailwind |
-| **BackEnd** | Express.js, Mongoose & MongoDB, JSON Web Token (JWT), bcryptjs, local-json-db fallback |
+### Sistem Multi-Peran
+
+SEAPEDIA mendukung empat peran akun: **Admin**, **Penjual**, **Pembeli**, dan **Pengemudi**. Untuk akun non-admin, satu nama pengguna dapat memiliki lebih dari satu peran secara bersamaan. Setelah masuk, pengguna yang memiliki lebih dari satu peran diwajibkan memilih peran aktif untuk sesi tersebut. Otorisasi sistem didasarkan pada peran aktif, bukan seluruh daftar peran yang dimiliki.
+
+### Single-Store Checkout
+
+Karena SEAPEDIA merupakan platform multi-penjual, satu sesi keranjang hanya dapat memuat produk dari **satu toko**. Jika pembeli mencoba menambahkan produk dari toko yang berbeda, sistem akan memberikan notifikasi dan meminta konfirmasi untuk mengosongkan keranjang terlebih dahulu. Aturan ini diimplementasikan di sisi backend dan ditampilkan secara eksplisit di antarmuka pengguna.
+
+*Catatan: Fitur checkout belum diimplementasikan pada level ini. Aturan single-store checkout akan diterapkan secara penuh pada Level 3.*
+
+### Keunikan Nama Toko
+
+Setiap penjual diwajibkan memiliki nama toko yang unik di seluruh platform. Validasi dilakukan di sisi backend melalui constraint database dan validasi pada lapisan route.
 
 ---
+
+## Akun Demo
+
+Buat akun baru melalui halaman `/register`. Setiap akun baru secara otomatis mendapatkan peran **Pembeli**.
+
+Untuk mendapatkan peran **Penjual**: buka halaman Akun Saya dan klik "Daftar Sebagai Penjual", kemudian masukkan nama toko.
+
+Untuk mendapatkan peran **Pengemudi**: buka halaman Akun Saya dan klik "Daftar Sebagai Pengemudi", kemudian lengkapi formulir pendaftaran.
+
+Akun **Admin** harus dibuat secara manual melalui skrip seed atau langsung pada database. Lihat dokumentasi Backend untuk detail lebih lanjut.
+
+---
+
+## Dokumentasi Tambahan
+
+- [Dokumentasi Backend](./BackEnd/README.md) — Panduan instalasi, daftar endpoint API, dan aturan bisnis backend.
+- [Dokumentasi Frontend](./FrontEnd/README.md) — Panduan instalasi, struktur komponen, dan catatan keamanan.
