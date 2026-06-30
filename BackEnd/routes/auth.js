@@ -21,20 +21,10 @@ const generateToken = (user) => {
 };
 
 router.post('/register', async (req, res) => {
-  const { username, password, roles } = req.body;
+  const { username, password } = req.body;
 
   if (!username || !password) {
     return res.status(400).json({ message: 'Username dan password wajib diisi' });
-  }
-
-  if (!roles || !Array.isArray(roles) || roles.length === 0) {
-    return res.status(400).json({ message: 'Minimal pilih satu peran (role)' });
-  }
-
-  const validRoles = ['Admin', 'Seller', 'Buyer', 'Driver'];
-  const hasInvalidRole = roles.some(role => !validRoles.includes(role));
-  if (hasInvalidRole) {
-    return res.status(400).json({ message: 'Terdapat peran tidak valid' });
   }
 
   try {
@@ -46,13 +36,11 @@ router.post('/register', async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const activeRole = roles[0];
-
     const newUser = await db.User.create({
       username,
       password: hashedPassword,
-      roles,
-      activeRole
+      roles: ['Buyer'],
+      activeRole: 'Buyer'
     });
 
     const token = generateToken(newUser);
@@ -117,7 +105,8 @@ router.get('/profile', authMiddleware, async (req, res) => {
       id: user._id || user.id,
       username: user.username,
       roles: user.roles,
-      activeRole: user.activeRole
+      activeRole: user.activeRole,
+      createdAt: user.createdAt ?? null,
     });
   } catch (err) {
     console.error(err);
@@ -156,6 +145,121 @@ router.post('/role', authMiddleware, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Terjadi kesalahan server saat memperbarui peran' });
+  }
+});
+
+router.post('/add-role/seller', authMiddleware, async (req, res) => {
+  const { storeName } = req.body;
+
+  if (!storeName || storeName.trim() === '') {
+    return res.status(400).json({ message: 'Nama toko wajib diisi' });
+  }
+
+  try {
+    const user = await db.User.findOne({ _id: req.user.id });
+    if (!user) {
+      return res.status(404).json({ message: 'User tidak ditemukan' });
+    }
+
+    const existingStoreOwner = await db.Store.findOne({ owner: req.user.id });
+    if (existingStoreOwner || user.roles.includes('Seller')) {
+      return res.status(400).json({ message: 'Anda sudah terdaftar sebagai Seller atau memiliki toko' });
+    }
+
+    const existingStoreName = await db.Store.findOne({ name: storeName.trim() });
+    if (existingStoreName) {
+      return res.status(400).json({ message: 'Nama toko sudah digunakan' });
+    }
+
+    const updatedRoles = [...user.roles];
+    if (!updatedRoles.includes('Seller')) {
+      updatedRoles.push('Seller');
+    }
+
+    const updatedUser = await db.User.updateUser(user._id || user.id, {
+      roles: updatedRoles,
+      activeRole: 'Seller'
+    });
+
+    if (!updatedUser) {
+      return res.status(500).json({ message: 'Gagal memperbarui peran user' });
+    }
+
+    await db.Store.create({
+      name: storeName.trim(),
+      description: '',
+      owner: updatedUser._id || updatedUser.id
+    });
+
+    const token = generateToken(updatedUser);
+
+    res.json({
+      token,
+      user: {
+        id: updatedUser._id || updatedUser.id,
+        username: updatedUser.username,
+        roles: updatedUser.roles,
+        activeRole: updatedUser.activeRole
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Terjadi kesalahan server saat menambahkan peran Seller' });
+  }
+});
+
+router.post('/add-role/driver', authMiddleware, async (req, res) => {
+  const { fullName, vehicleNumber } = req.body;
+
+  if (!fullName || fullName.trim() === '') {
+    return res.status(400).json({ message: 'Nama lengkap wajib diisi' });
+  }
+  if (!vehicleNumber || vehicleNumber.trim() === '') {
+    return res.status(400).json({ message: 'Nomor kendaraan wajib diisi' });
+  }
+
+  try {
+    const user = await db.User.findOne({ _id: req.user.id });
+    if (!user) {
+      return res.status(404).json({ message: 'User tidak ditemukan' });
+    }
+
+    if (user.roles.includes('Driver')) {
+      return res.status(400).json({ message: 'Anda sudah terdaftar sebagai Driver' });
+    }
+
+    const updatedRoles = [...user.roles];
+    if (!updatedRoles.includes('Driver')) {
+      updatedRoles.push('Driver');
+    }
+
+    const updatedUser = await db.User.updateUser(user._id || user.id, {
+      roles: updatedRoles,
+      activeRole: 'Driver',
+      driverDetails: {
+        fullName: fullName.trim(),
+        vehicleNumber: vehicleNumber.trim()
+      }
+    });
+
+    if (!updatedUser) {
+      return res.status(500).json({ message: 'Gagal memperbarui peran user' });
+    }
+
+    const token = generateToken(updatedUser);
+
+    res.json({
+      token,
+      user: {
+        id: updatedUser._id || updatedUser.id,
+        username: updatedUser.username,
+        roles: updatedUser.roles,
+        activeRole: updatedUser.activeRole
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Terjadi kesalahan server saat menambahkan peran Driver' });
   }
 });
 

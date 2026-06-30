@@ -6,6 +6,7 @@ import authRoutes from './routes/auth.js';
 import reviewRoutes from './routes/reviews.js';
 import storeRoutes from './routes/stores.js';
 import productRoutes from './routes/products.js';
+import userRoutes from './routes/users.js';
 
 dotenv.config();
 
@@ -19,12 +20,14 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.use(express.json());
+// Increase JSON limit to handle base64 photo uploads (~7 MB)
+app.use(express.json({ limit: '8mb' }));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/stores', storeRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/users', userRoutes);
 
 app.get('/', (req, res) => {
   res.send('API Seapedia berjalan lancar!');

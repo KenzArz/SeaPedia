@@ -15,6 +15,16 @@ const storeSchema = new mongoose.Schema({
     maxlength: [500, 'Deskripsi maksimal 500 karakter'],
     default: ''
   },
+  businessType: {
+    type: String,
+    trim: true,
+    maxlength: [100, 'Jenis usaha maksimal 100 karakter'],
+    default: ''
+  },
+  storePhoto: {
+    type: String,   // URL or base64 data URI
+    default: ''
+  },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

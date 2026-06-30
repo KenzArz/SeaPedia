@@ -78,7 +78,28 @@ const UserSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   roles: { type: [String], default: ['Buyer'] },
-  activeRole: { type: String, default: 'Buyer' }
+  activeRole: { type: String, default: 'Buyer' },
+  driverDetails: {
+    fullName: { type: String },
+    vehicleNumber: { type: String }
+  },
+  // ── Profile fields (added for Level 1 Personal Profile) ──
+  // profilePhoto stores either a public URL or a base64 data URI.
+  // Trade-off: base64 is simple (no storage infra needed) but inflates JSON/MongoDB
+  // document size (~33% overhead). For Level 1 demo this is acceptable.
+  // Real file upload (multer + cloud storage) can be swapped in later without
+  // changing the API contract — the frontend always sends a string.
+  profilePhoto: { type: String, default: '' },
+  fullName:     { type: String, trim: true, default: '' },
+  dateOfBirth:  { type: Date, default: null },
+  gender: {
+    type: String,
+    enum: ['Male', 'Female', 'Prefer not to say'],
+    default: 'Prefer not to say'
+  },
+  phoneNumber:     { type: String, trim: true, default: '' },
+  isEmailVerified: { type: Boolean, default: false },
+  createdAt:       { type: Date, default: Date.now }
 });
 const MongooseUser = mongoose.model('User', UserSchema);
 
@@ -113,6 +134,7 @@ export const db = {
           _id: Math.random().toString(36).substring(2, 9),
           roles: ['Buyer'],
           activeRole: 'Buyer',
+          createdAt: new Date().toISOString(),
           ...userData
         };
         // Check uniqueness of username
@@ -138,6 +160,56 @@ export const db = {
           writeLocalDb(localData);
         }
         return user;
+      }
+    },
+    updateUser: async (userId, updateData) => {
+      if (!useLocalDb) {
+        return await MongooseUser.findByIdAndUpdate(userId, updateData, { new: true });
+      } else {
+        const localData = readLocalDb();
+        const userIndex = localData.users.findIndex(u => u._id === userId);
+        if (userIndex !== -1) {
+          localData.users[userIndex] = {
+            ...localData.users[userIndex],
+            ...updateData
+          };
+          writeLocalDb(localData);
+          return localData.users[userIndex];
+        }
+        return null;
+      }
+    },
+    // Update profile fields (fullName, dateOfBirth, gender, phoneNumber).
+    // Intentionally does NOT allow changing roles, activeRole, password, or username.
+    updateProfile: async (userId, { fullName, dateOfBirth, gender, phoneNumber }) => {
+      const patch = {};
+      if (fullName   !== undefined) patch.fullName   = fullName;
+      if (dateOfBirth !== undefined) patch.dateOfBirth = dateOfBirth;
+      if (gender     !== undefined) patch.gender     = gender;
+      if (phoneNumber !== undefined) patch.phoneNumber = phoneNumber;
+
+      if (!useLocalDb) {
+        return await MongooseUser.findByIdAndUpdate(userId, patch, { new: true });
+      } else {
+        const localData = readLocalDb();
+        const idx = localData.users.findIndex(u => u._id === userId);
+        if (idx === -1) return null;
+        localData.users[idx] = { ...localData.users[idx], ...patch };
+        writeLocalDb(localData);
+        return localData.users[idx];
+      }
+    },
+    // Update only the profilePhoto field (URL or base64 data URI).
+    updatePhoto: async (userId, photoUrl) => {
+      if (!useLocalDb) {
+        return await MongooseUser.findByIdAndUpdate(userId, { profilePhoto: photoUrl }, { new: true });
+      } else {
+        const localData = readLocalDb();
+        const idx = localData.users.findIndex(u => u._id === userId);
+        if (idx === -1) return null;
+        localData.users[idx].profilePhoto = photoUrl;
+        writeLocalDb(localData);
+        return localData.users[idx];
       }
     }
   },
@@ -169,7 +241,7 @@ export const db = {
   Store: {
     findOne: async (query) => {
       if (!useLocalDb) {
-        return await Store.findOne(query).populate('owner', 'username');
+        return await Store.findOne(query).populate('owner', 'username').lean();
       } else {
         const localData = readLocalDb();
         const store = localData.stores.find(s => {
@@ -209,9 +281,9 @@ export const db = {
         return newStore;
       }
     },
-    findOneAndUpdate: async (query, updateData) => {
+    findOneAndUpdate: async (query, updateData, options = {}) => {
       if (!useLocalDb) {
-        return await Store.findOneAndUpdate(query, updateData, { new: true }).populate('owner', 'username');
+        return await Store.findOneAndUpdate(query, updateData, { new: true, ...options }).populate('owner', 'username').lean();
       } else {
         const localData = readLocalDb();
         const storeIndex = localData.stores.findIndex(s => {
@@ -244,7 +316,7 @@ export const db = {
     },
     findById: async (id) => {
       if (!useLocalDb) {
-        return await Store.findById(id).populate('owner', 'username');
+        return await Store.findById(id).populate('owner', 'username').lean();
       } else {
         const localData = readLocalDb();
         const store = localData.stores.find(s => s._id === id);
