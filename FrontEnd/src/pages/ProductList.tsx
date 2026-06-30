@@ -100,10 +100,9 @@ export const ProductList: React.FC = () => {
 	return (
 		<div className="plp-page">
 			<header className="plp-header">
-				<h1 className="plp-title">Pasar Produk Bahari</h1>
+				<h1 className="plp-title">Katalog Produk</h1>
 				<p className="plp-subtitle">
-					Temukan produk hasil laut segar terbaik langsung dari nelayan &amp;
-					distributor terpercaya.
+					Temukan produk terbaik dari ribuan toko terpercaya di seluruh Indonesia.
 				</p>
 			</header>
 

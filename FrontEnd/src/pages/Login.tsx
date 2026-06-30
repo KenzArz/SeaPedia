@@ -53,12 +53,12 @@ export const Login: React.FC = () => {
 					<div className="auth-side-brand-inner">
 						<span className="auth-brand-wave">🌊</span>
 						<h2 className="auth-side-title">
-							Hubungkan Bisnis Bahari Anda di SEAPEDIA
+							Hubungkan Bisnis Anda di SEAPEDIA
 						</h2>
 						<p className="auth-side-desc">
-							Satu platform maritime commerce terpadu yang memfasilitasi
+							Satu platform e-commerce terpadu yang memfasilitasi
 							transaksi aman, transparan, dan terpercaya untuk seluruh pelaku
-							usaha kelautan Indonesia.
+							usaha di Indonesia.
 						</p>
 
 						<ul className="auth-brand-benefits">

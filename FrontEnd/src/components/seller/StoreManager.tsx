@@ -357,7 +357,7 @@ const StoreManager: React.FC<StoreManagerProps> = ({ onStoreLoaded }) => {
 													className="sm-input"
 													value={createName}
 													onChange={(e) => setCreateName(e.target.value)}
-													placeholder="Contoh: Toko Bahari Sejahtera"
+													placeholder="Contoh: Toko Sejahtera Mandiri"
 													maxLength={100}
 													disabled={creating}
 													autoFocus

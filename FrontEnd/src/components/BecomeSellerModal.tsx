@@ -45,7 +45,7 @@ export const BecomeSellerModal: React.FC<BecomeSellerModalProps> = ({
 				>
 					<h2>Buka Toko Baru</h2>
 					<p className="modal-sub">
-						Mulai menjual hasil laut segar Anda langsung di SEAPEDIA.
+						Mulai menjual produk Anda langsung di SEAPEDIA.
 					</p>
 					<button
 						onClick={onClose}

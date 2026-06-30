@@ -7,14 +7,14 @@ const roles = [
     id: 'buyer',
     icon: ShoppingBag,
     label: 'Pembeli',
-    tagline: 'Belanja langsung dari nelayan',
-    steps: ['Temukan produk segar', 'Bayar aman via wallet', 'Terima & nikmati'],
+    tagline: 'Belanja dari ribuan toko terpercaya',
+    steps: ['Temukan produk pilihan', 'Bayar aman via wallet', 'Terima & nikmati'],
     accent: 'var(--buyer-color)',
     accentLight: 'var(--buyer-light)',
     imgSrc:
-      'https://images.unsplash.com/photo-1559737632-154df6a9c2b4?w=480&h=340&fit=crop&auto=format',
+      'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=480&h=340&fit=crop&auto=format',
     imgFallback:
-      'https://images.unsplash.com/photo-1534604973900-c43ab4c2e0ab?w=480&h=340&fit=crop&auto=format',
+      'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=480&h=340&fit=crop&auto=format',
   },
   {
     id: 'seller',
@@ -25,9 +25,9 @@ const roles = [
     accent: 'var(--seller-color)',
     accentLight: 'var(--seller-light)',
     imgSrc:
-      'https://images.unsplash.com/photo-1544025162-d76694265947?w=480&h=340&fit=crop&auto=format',
+      'https://images.unsplash.com/photo-1556742111-a301076d9d18?w=480&h=340&fit=crop&auto=format',
     imgFallback:
-      'https://images.unsplash.com/photo-1553618551-fba689030290?w=480&h=340&fit=crop&auto=format',
+      'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=480&h=340&fit=crop&auto=format',
   },
   {
     id: 'driver',
@@ -38,9 +38,9 @@ const roles = [
     accent: 'var(--driver-color)',
     accentLight: 'var(--driver-light)',
     imgSrc:
-      'https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?w=480&h=340&fit=crop&auto=format',
+      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=480&h=340&fit=crop&auto=format',
     imgFallback:
-      'https://images.unsplash.com/photo-1534177616072-ef7b14649b7b?w=480&h=340&fit=crop&auto=format',
+      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=480&h=340&fit=crop&auto=format',
   },
 ];
 
@@ -53,7 +53,7 @@ export const HowItWorks: React.FC = () => {
           Satu Platform,<br />Tiga Peran Berbeda
         </h2>
         <p className="section-desc anim-fade-up-d2">
-          SEAPEDIA dirancang untuk semua aktor dalam rantai pasok bahari. Pilih peran Anda —
+          SEAPEDIA dirancang untuk semua pelaku transaksi digital. Pilih peran Anda —
           atau aktifkan ketiganya sekaligus.
         </p>
 

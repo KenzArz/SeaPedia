@@ -7,7 +7,35 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.25;
 }
 
-/* ── Global Buttons ────────────────────────────────────────── */
+/* ── Button size variants ────────────────────────────────── */
+.btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  border-radius: var(--r-sm);
+  transition: all var(--t-fast) var(--ease);
+}
+.btn-sm  { padding: 6px 14px;  font-size: 12.5px; }
+.btn-md  { padding: 10px 20px; font-size: var(--text-sm); }
+.btn-lg  { padding: 13px 28px; font-size: var(--text-base); }
+
+/* Variant overrides */
+.btn-primary  { background: var(--primary); color: #fff; box-shadow: 0 2px 8px rgba(79,70,229,0.2); }
+.btn-primary:hover  { background: var(--primary-hover); }
+.btn-secondary { background: var(--bg-surface); color: var(--text-primary); border: 1.5px solid var(--border-strong); }
+.btn-secondary:hover { background: var(--bg-card); border-color: var(--primary); }
+.btn-outline  { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); }
+.btn-outline:hover  { background: var(--primary-light); }
+.btn-text     { background: transparent; color: var(--text-secondary); }
+.btn-text:hover     { color: var(--text-primary); background: var(--bg-surface); }
+.btn-danger   { background: #dc2626; color: #fff; }
+.btn-danger:hover   { background: #b91c1c; }
+.btn-base:disabled  { opacity: 0.55; cursor: not-allowed; }
 .btn-primary,
 .btn-hero-primary {
   display: inline-flex;

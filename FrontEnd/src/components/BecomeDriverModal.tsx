@@ -50,8 +50,7 @@ export const BecomeDriverModal: React.FC<BecomeDriverModalProps> = ({
 				>
 					<h2>Daftar Jadi Pengemudi</h2>
 					<p className="modal-sub">
-						Bergabung sebagai mitra logistik SEAPEDIA untuk mengantar hasil laut
-						segar.
+						Bergabung sebagai mitra logistik SEAPEDIA untuk mengantarkan pesanan pembeli.
 					</p>
 					<button
 						onClick={onClose}

@@ -47,7 +47,7 @@ export const FeaturedProducts: React.FC = () => {
         <div className="fp-header">
           <div>
             <div className="section-label anim-fade-up">Produk Unggulan</div>
-            <h2 className="section-heading anim-fade-up-d1">Segar Langsung dari&nbsp;<br />Sumber Terpercaya</h2>
+            <h2 className="section-heading anim-fade-up-d1">Pilihan Produk Terbaik&nbsp;<br />dari Toko Terpercaya</h2>
           </div>
           <Link to="/products" className="btn-fp-all anim-fade-up-d1">
             Lihat Semua <ArrowRight size={16} />

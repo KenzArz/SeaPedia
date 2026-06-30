@@ -12,19 +12,19 @@ export const HeroSection: React.FC = () => {
         <div className="hero-text-col">
           <div className="hero-eyebrow anim-fade-up">
             <span className="hero-eyebrow-dot" />
-            <span>Platform Bahari #1 Indonesia — COMPFEST 18</span>
+            <span>Platform E-Commerce #1 Indonesia — COMPFEST 18</span>
           </div>
 
           <h1 className="hero-headline anim-fade-up-d1">
-            Pasar Laut yang&nbsp;
-            <span className="hero-headline-accent">Jujur</span>
+            Belanja yang&nbsp;
+            <span className="hero-headline-accent">Mudah</span>
             &nbsp;&amp;&nbsp;
-            <span className="hero-headline-accent">Segar</span>
+            <span className="hero-headline-accent">Terpercaya</span>
           </h1>
 
           <p className="hero-body anim-fade-up-d2">
-            SEAPEDIA menghubungkan nelayan, pembeli, dan kurir dalam satu ekosistem digital yang
-            transparan — dari tambak langsung ke meja makan Anda.
+            SEAPEDIA menghubungkan penjual, pembeli, dan kurir dalam satu ekosistem digital yang
+            transparan — temukan produk terbaik dari ribuan toko terpercaya.
           </p>
 
           <div className="hero-actions anim-fade-up-d3">
@@ -37,8 +37,8 @@ export const HeroSection: React.FC = () => {
           </div>
 
           <div className="hero-trust anim-fade-up-d4">
-            <span className="trust-chip"><ShieldCheck size={14} /> Garansi Segar</span>
-            <span className="trust-chip"><Zap size={14} /> Pengiriman Eksprès</span>
+            <span className="trust-chip"><ShieldCheck size={14} /> Transaksi Aman</span>
+            <span className="trust-chip"><Zap size={14} /> Pengiriman Cepat</span>
             <span className="trust-chip"><Users size={14} /> 3 Peran Dalam 1</span>
           </div>
         </div>
@@ -46,12 +46,12 @@ export const HeroSection: React.FC = () => {
         <div className="hero-visual-col anim-fade anim-fade-up-d2">
           <div className="hero-img-card">
             <img
-              src="https://images.unsplash.com/photo-1534604973900-c43ab4c2e0ab?w=800&h=700&fit=crop&auto=format"
-              alt="Produk ikan segar SEAPEDIA"
+              src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800&h=700&fit=crop&auto=format"
+              alt="Belanja online mudah di SEAPEDIA"
               className="hero-img"
               onError={(e) => {
                 (e.target as HTMLImageElement).src =
-                  'https://images.unsplash.com/photo-1510130387422-82bed34b37e9?w=800&h=700&fit=crop&auto=format';
+                  'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=700&fit=crop&auto=format';
               }}
             />
             <div className="hero-badge hero-badge-tl">

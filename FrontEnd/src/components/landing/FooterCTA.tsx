@@ -18,11 +18,11 @@ export const FooterCTA: React.FC = () => {
               </div>
 
               <h2 className="footer-cta-heading">
-                Siap Bergabung dengan<br />Ribuan Pelaku Bahari?
+                Siap Bergabung dengan<br />Ribuan Penjual &amp; Pembeli?
               </h2>
               <p className="footer-cta-desc">
-                Daftarkan akun SEAPEDIA Anda secara gratis sekarang. Mulai berbelanja produk segar,
-                memasarkan produk tangkapan Anda, atau bekerja sebagai mitra kurir terpercaya.
+                Daftarkan akun SEAPEDIA Anda secara gratis sekarang. Mulai berbelanja produk pilihan,
+                buka toko online Anda sendiri, atau bekerja sebagai mitra kurir terpercaya.
               </p>
 
               <div className="footer-cta-actions">
@@ -37,7 +37,7 @@ export const FooterCTA: React.FC = () => {
               <div className="footer-cta-stats">
                 <div className="cta-stat">
                   <span className="cta-stat-num">2.4K+</span>
-                  <span className="cta-stat-lbl">Nelayan</span>
+                  <span className="cta-stat-lbl">Penjual</span>
                 </div>
                 <div className="cta-stat-divider" />
                 <div className="cta-stat">
@@ -107,7 +107,7 @@ export const FooterCTA: React.FC = () => {
           <div className="footer-bar-inner">
             <div className="footer-brand">
               <span className="footer-logo">🌊 SEAPEDIA</span>
-              <span className="footer-tagline">Maritime Commerce Platform — COMPFEST 18 Academy</span>
+              <span className="footer-tagline">Platform E-Commerce Terpadu — COMPFEST 18 Academy</span>
             </div>
             <div className="footer-links">
               <Link to="/" className="footer-link">Beranda</Link>

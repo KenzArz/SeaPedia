@@ -77,9 +77,9 @@ export const ProductDetail: React.FC = () => {
 			<div className="pdp-not-found">
 				<Package size={56} className="pdp-nf-icon" />
 				<h2>Produk Tidak Ditemukan</h2>
-				<p>Maaf, produk yang Anda cari tidak tersedia di pasar SEAPEDIA.</p>
+				<p>Maaf, produk yang Anda cari tidak tersedia di SEAPEDIA.</p>
 				<Link to="/products" className="btn-pdp-back">
-					<ArrowLeft size={16} /> Kembali ke Pasar
+					<ArrowLeft size={16} /> Kembali ke Katalog
 				</Link>
 			</div>
 		);
@@ -256,8 +256,7 @@ export const ProductDetail: React.FC = () => {
 						<div className="pdp-trust-seal">
 							<ShieldCheck size={16} className="pdp-trust-icon" />
 							<span>
-								Garansi Kesegaran SEAPEDIA — Uang kembali 100% jika produk tidak
-								segar.
+								Jaminan SEAPEDIA — Transaksi aman &amp; terlindungi sepenuhnya.
 							</span>
 						</div>
 					</div>
