@@ -1,274 +1,504 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import {
-  LayoutDashboard, ShoppingBag, Store, Truck, Shield,
-  Wallet, ClipboardList, MapPin, Package, Tag, BarChart3,
-  ChevronRight, RefreshCw, LogOut, Home, AlertTriangle
-} from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import Card from '../components/Card';
+	User,
+	ShoppingBag,
+	ClipboardList,
+	Wallet,
+	Store,
+	Package,
+	Truck,
+	LogOut,
+	RefreshCw,
+	AlertTriangle,
+	Shield,
+	BarChart3,
+} from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import BecomeSellerModal from "../components/BecomeSellerModal";
+import BecomeDriverModal from "../components/BecomeDriverModal";
+import RoleModal from "../components/RoleModal";
+import StoreManager from "../components/seller/StoreManager";
+import ProductManager from "../components/seller/ProductManager";
+import PersonalProfile from "./PersonalProfile";
+import AccountOverview from "../components/AccountOverview";
+import AvatarFallback from "../components/AvatarFallback";
+import { storeService } from "../services/storeService";
 import "../styles/Dashboard.css";
 
-const roleConfig = {
-  Admin: { color: 'var(--admin-color)', light: 'var(--admin-light)', icon: Shield, label: 'Administrator' },
-  Buyer: { color: 'var(--buyer-color)', light: 'var(--buyer-light)', icon: ShoppingBag, label: 'Pembeli (Buyer)' },
-  Seller: { color: 'var(--seller-color)', light: 'var(--seller-light)', icon: Store, label: 'Penjual (Seller)' },
-  Driver: { color: 'var(--driver-color)', light: 'var(--driver-light)', icon: Truck, label: 'Kurir (Driver)' },
-};
+type ViewTab =
+	| "akun"
+	| "profile"
+	| "store"
+	| "products"
+	| "driver_dash"
+	| "dasbor";
 
-interface ShellItem {
-  icon: React.FC<any>;
-  title: string;
-  desc: string;
-  badge: string;
+interface DriverDetails {
+	fullName: string;
+	vehicleNumber: string;
+	registeredAt?: string;
 }
 
-const dashboardItems: Record<string, ShellItem[]> = {
-  Buyer: [
-    { icon: Wallet, title: 'Wallet & Saldo', desc: 'Lihat saldo dompet, lakukan top-up, dan riwayat transaksi', badge: 'Level 3' },
-    { icon: ShoppingBag, title: 'Keranjang Belanja', desc: 'Kelola item yang ingin Anda beli dari satu toko', badge: 'Level 3' },
-    { icon: ClipboardList, title: 'Riwayat Pesanan', desc: 'Pantau status semua pesanan yang pernah Anda buat', badge: 'Level 3' },
-    { icon: MapPin, title: 'Alamat Pengiriman', desc: 'Simpan dan kelola alamat tujuan pengiriman Anda', badge: 'Level 3' },
-  ],
-  Seller: [
-    { icon: Store, title: 'Kelola Toko', desc: 'Buat nama toko unik dan kelola profil lapak Anda', badge: 'Level 2' },
-    { icon: Package, title: 'Manajemen Produk', desc: 'Tambah, edit, dan hapus produk di katalog toko Anda', badge: 'Level 2' },
-    { icon: ClipboardList, title: 'Pesanan Masuk', desc: 'Lihat dan proses pesanan pembeli di toko Anda', badge: 'Level 4' },
-    { icon: Wallet, title: 'Pendapatan Toko', desc: 'Monitor pendapatan dan laporan keuangan toko Anda', badge: 'Level 4' },
-  ],
-  Driver: [
-    { icon: Truck, title: 'Cari Pekerjaan', desc: 'Temukan dan klaim pesanan pengiriman yang tersedia', badge: 'Level 5' },
-    { icon: MapPin, title: 'Rute Pengiriman', desc: 'Navigasi dan konfirmasi pengantaran produk bahari', badge: 'Level 5' },
-    { icon: Wallet, title: 'Pendapatan Driver', desc: 'Pantau penghasilan per ritase pengiriman', badge: 'Level 5' },
-    { icon: ClipboardList, title: 'Riwayat Perjalanan', desc: 'Lihat semua pekerjaan pengiriman yang pernah Anda selesaikan', badge: 'Level 5' },
-  ],
-  Admin: [
-    { icon: BarChart3, title: 'Monitoring Pasar', desc: 'Pantau seluruh transaksi dan aktivitas marketplace', badge: 'Level 6' },
-    { icon: Tag, title: 'Manajemen Diskon', desc: 'Kelola voucher dan promo belanja platform', badge: 'Level 6' },
-    { icon: AlertTriangle, title: 'Penanganan Keterlambatan', desc: 'Tindak lanjuti pesanan yang melewati SLA pengiriman', badge: 'Level 6' },
-    { icon: Shield, title: 'Kontrol Keamanan', desc: 'Audit akses dan keamanan API platform', badge: 'Level 7' },
-  ],
+const roleConfig = {
+	Admin: {
+		color: "var(--admin-color)",
+		light: "var(--admin-light)",
+		icon: Shield,
+		label: "Administrator",
+	},
+	Buyer: {
+		color: "var(--buyer-color)",
+		light: "var(--buyer-light)",
+		icon: ShoppingBag,
+		label: "Pembeli",
+	},
+	Seller: {
+		color: "var(--seller-color)",
+		light: "var(--seller-light)",
+		icon: Store,
+		label: "Penjual",
+	},
+	Driver: {
+		color: "var(--driver-color)",
+		light: "var(--driver-light)",
+		icon: Truck,
+		label: "Kurir",
+	},
 };
 
+function getDefaultTab(role: string): ViewTab {
+	if (role === "Seller") return "store";
+	if (role === "Driver") return "driver_dash";
+	return "dasbor";
+}
+
+function getViewTitle(tab: ViewTab): string {
+	const titles: Record<ViewTab, string> = {
+		dasbor: "",
+		akun: "Akun Saya",
+		profile: "",
+		store: "",
+		products: "",
+		driver_dash: "Dashboard Kurir",
+	};
+	return titles[tab];
+}
+
+const DRIVER_CACHE_KEY = "seapedia_driver_details";
+
 export const Dashboard: React.FC = () => {
-  const { user, logout, switchRole } = useAuth();
-  const navigate = useNavigate();
-  const [activeNav, setActiveNav] = useState('dashboard');
+	const { user, logout, switchRole, addRole } = useAuth();
+	const navigate = useNavigate();
 
-  if (!user) {
-    return (
-      <div className="dash-not-auth">
-        <AlertTriangle size={52} />
-        <h2>Akses Ditolak</h2>
-        <p>Silakan masuk untuk mengakses halaman dashboard Anda.</p>
-        <Link to="/login" className="btn-dash-auth-redirect">Masuk Sekarang</Link>
-      </div>
-    );
-  }
+	const [activeTab, setActiveTab] = useState<ViewTab>("akun");
+	const [hasStore, setHasStore] = useState(false);
+	const [storeName, setStoreName] = useState<string | null>(null);
+	const [driverDetails, setDriverDetails] = useState<DriverDetails | null>(
+		null,
+	);
+	const [isSellerModalOpen, setIsSellerModalOpen] = useState(false);
+	const [isDriverModalOpen, setIsDriverModalOpen] = useState(false);
+	const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
 
-  const config = roleConfig[user.activeRole as keyof typeof roleConfig] || roleConfig.Buyer;
-  const RoleIcon = config.icon;
-  const items = dashboardItems[user.activeRole] || dashboardItems.Buyer;
+	const handleStoreLoaded = useCallback((exists: boolean) => {
+		setHasStore(exists);
+	}, []);
 
-  const handleRoleSwitch = async (role: string) => {
-    try {
-      await switchRole(role);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+	useEffect(() => {
+		if (user) {
+			setActiveTab(getDefaultTab(user.activeRole));
+		}
+	}, [user?.activeRole]);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
+	useEffect(() => {
+		if (!user || user.activeRole !== "Seller") {
+			setStoreName(null);
+			return;
+		}
+		storeService
+			.getMyStore()
+			.then((store) => setStoreName(store?.name ?? null))
+			.catch(() => setStoreName(null));
+	}, [user?.activeRole, hasStore]);
 
-  return (
-    <div className="dash-layout">
-      <aside className="dash-sidebar">
-        <div className="dash-sidebar-inner">
-          <Link to="/" className="dash-brand">🌊 SEAPEDIA</Link>
+	useEffect(() => {
+		if (!user?.roles.includes("Driver")) return;
+		const cached = localStorage.getItem(DRIVER_CACHE_KEY);
+		if (cached) {
+			try {
+				setDriverDetails(JSON.parse(cached));
+			} catch {
+				setDriverDetails(null);
+			}
+		}
+	}, [user?.roles]);
 
-          <div className="dash-user-block">
-            <div 
-              className="dash-user-avatar" 
-              style={{
-                backgroundColor: config.light,
-                color: config.color,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: '700',
-                fontSize: '16px',
-                border: `1.5px solid ${config.color}20`
-              }}
-            >
-              {user.username.charAt(0).toUpperCase()}
-            </div>
-            <div className="dash-user-info">
-              <span className="dash-username">{user.username}</span>
-              <span className="dash-role-badge" style={{ backgroundColor: config.light, color: config.color }}>
-                {config.label}
-              </span>
-            </div>
-          </div>
+	if (!user) {
+		return (
+			<div className="db-not-auth">
+				<AlertTriangle size={52} />
+				<h2>Akses Ditolak</h2>
+				<p>Silakan masuk untuk mengakses halaman dashboard Anda.</p>
+				<Link to="/login">Masuk Sekarang</Link>
+			</div>
+		);
+	}
 
-          <nav className="dash-nav">
-            <button
-              className={`dash-nav-item ${activeNav === 'dashboard' ? 'dash-nav-item--active' : ''}`}
-              onClick={() => setActiveNav('dashboard')}
-            >
-              <LayoutDashboard size={18} />
-              <span>Dashboard</span>
-            </button>
-            <Link to="/" className="dash-nav-item">
-              <Home size={18} />
-              <span>Beranda</span>
-            </Link>
-            <Link to="/products" className="dash-nav-item">
-              <Package size={18} />
-              <span>Produk</span>
-            </Link>
-          </nav>
+	const config =
+		roleConfig[user.activeRole as keyof typeof roleConfig] || roleConfig.Buyer;
+	const roleStyle = {
+		"--item-color": config.color,
+		"--item-bg": config.light,
+	} as React.CSSProperties;
 
-          {user.roles.length > 1 && (
-            <div className="dash-role-switcher">
-              <p className="dash-switcher-label">Ganti Peran Aktif</p>
-              {user.roles.map(role => {
-                const rc = roleConfig[role as keyof typeof roleConfig];
-                if (!rc) return null;
-                const Ic = rc.icon;
-                return (
-                  <button
-                    key={role}
-                    className={`dash-role-switch-btn ${user.activeRole === role ? 'dash-role-switch-btn--active' : ''}`}
-                    style={user.activeRole === role
-                      ? { backgroundColor: rc.light, color: rc.color, borderColor: rc.color }
-                      : {}
-                    }
-                    onClick={() => handleRoleSwitch(role)}
-                  >
-                    <Ic size={15} />
-                    <span>{rc.label}</span>
-                    {user.activeRole === role && <span className="dash-active-dot" style={{ backgroundColor: rc.color }} />}
-                  </button>
-                );
-              })}
-            </div>
-          )}
+	const handleRoleSwitch = async (role: string) => {
+		try {
+			await switchRole(role);
+			setActiveTab(getDefaultTab(role));
+			setIsRoleModalOpen(false);
+		} catch (err) {
+			console.error(err);
+		}
+	};
 
-          <div className="dash-sidebar-footer">
-            <button className="dash-logout-btn" onClick={handleLogout}>
-              <LogOut size={16} />
-              <span>Keluar</span>
-            </button>
-          </div>
-        </div>
-      </aside>
+	const handleSellerSubmit = async (name: string) => {
+		await addRole("seller", { storeName: name });
+		setIsSellerModalOpen(false);
+		setActiveTab("store");
+	};
 
-      <main className="dash-main">
-        <div className="dash-topbar">
-          <div className="dash-topbar-left">
-            <h1 className="dash-topbar-title">Dashboard</h1>
-            <span className="dash-topbar-sub">Selamat datang kembali, {user.username}!</span>
-          </div>
-          <div className="dash-topbar-right">
-            <div className="dash-active-role-pill" style={{ backgroundColor: config.light, color: config.color }}>
-              <RoleIcon size={14} />
-              <span>{config.label}</span>
-            </div>
-            {user.roles.length > 1 && (
-              <button
-                className="dash-topbar-switch-btn"
-                onClick={() => handleRoleSwitch(
-                  user.roles[(user.roles.indexOf(user.activeRole) + 1) % user.roles.length]
-                )}
-              >
-                <RefreshCw size={14} />
-                <span>Ganti Peran</span>
-              </button>
-            )}
-          </div>
-        </div>
+	const handleDriverSubmit = async (
+		fullName: string,
+		vehicleNumber: string,
+	) => {
+		await addRole("driver", { fullName, vehicleNumber });
+		const details: DriverDetails = {
+			fullName,
+			vehicleNumber,
+			registeredAt: new Date().toISOString(),
+		};
+		localStorage.setItem(DRIVER_CACHE_KEY, JSON.stringify(details));
+		setDriverDetails(details);
+		setIsDriverModalOpen(false);
+		setActiveTab("driver_dash");
+	};
 
-        <div
-          className="dash-welcome-banner"
-          style={{ background: `linear-gradient(135deg, ${config.light} 0%, var(--bg-card) 100%)`, borderColor: `${config.color}25` }}
-        >
-          <div className="dash-welcome-icon" style={{ backgroundColor: `${config.color}15`, color: config.color }}>
-            <RoleIcon size={26} />
-          </div>
-          <div className="dash-welcome-text">
-            <h2>Dashboard Peran: <span style={{ color: config.color }}>{config.label}</span></h2>
-            <p>Fitur di bawah ini telah dikonfigurasi untuk akun Anda dan akan aktif sesuai timeline rilis fitur SEAPEDIA.</p>
-          </div>
-        </div>
+	const handleLogout = () => {
+		logout();
+		navigate("/");
+	};
 
-        <div className="dash-shell-grid">
-          {items.map((item, idx) => {
-            const ItemIcon = item.icon;
-            return (
-              <div key={idx} className="dash-shell-card">
-                <div className="dash-shell-card-icon" style={{ backgroundColor: config.light, color: config.color }}>
-                  <ItemIcon size={20} />
-                </div>
-                <div className="dash-shell-card-content">
-                  <div className="dash-shell-card-header">
-                    <h4 className="dash-shell-card-title">{item.title}</h4>
-                    <span className="dash-level-badge">{item.badge}</span>
-                  </div>
-                  <p className="dash-shell-card-desc">{item.desc}</p>
-                </div>
-                <ChevronRight size={16} className="dash-shell-chevron" />
-              </div>
-            );
-          })}
-        </div>
+	const navBtn = (
+		tab: ViewTab,
+		label: string,
+		icon: React.FC<{ size?: number; className?: string }>,
+		disabled = false,
+	) => {
+		const Icon = icon;
+		return (
+			<button
+				key={tab}
+				className={`db-nav-item${activeTab === tab ? " db-nav-item--active" : ""}${disabled ? " db-nav-item--disabled" : ""}`}
+				style={roleStyle}
+				onClick={() => !disabled && setActiveTab(tab)}
+			>
+				<Icon size={18} className="db-nav-item-icon" />
+				<span>{label}</span>
+			</button>
+		);
+	};
 
-        <div className="dash-financial-row">
-          <Card title="Ringkasan Keuangan Platform" className="dash-financial-card">
-            <div className="dash-fin-items">
-              <div className="dash-fin-item">
-                <span className="dash-fin-label"><ShoppingBag size={13} /> Saldo Pembeli</span>
-                <span className="dash-fin-val">Rp 0</span>
-              </div>
-              <div className="dash-fin-item">
-                <span className="dash-fin-label"><Store size={13} /> Pendapatan Toko</span>
-                <span className="dash-fin-val">Rp 0</span>
-              </div>
-              <div className="dash-fin-item">
-                <span className="dash-fin-label"><Truck size={13} /> Pendapatan Kurir</span>
-                <span className="dash-fin-val">Rp 0</span>
-              </div>
-            </div>
-          </Card>
-        </div>
-      </main>
+	const renderBuyerNav = () => (
+		<>
+			{navBtn("dasbor", "Dasbor Terpadu", ShoppingBag)}
+			{navBtn("profile", "Profil Saya", User)}
+			<div className="db-nav-divider" />
+			{user.roles.includes("Seller") ? (
+				navBtn("store", "Toko Saya", Store)
+			) : (
+				<button
+					className="db-nav-item db-nav-item--action"
+					style={roleStyle}
+					onClick={() => setIsSellerModalOpen(true)}
+				>
+					<Store size={18} className="db-nav-item-icon" />
+					<span>Buka Toko</span>
+				</button>
+			)}
+			{user.roles.includes("Driver") ? (
+				navBtn("driver_dash", "Dashboard Pengemudi", Truck)
+			) : (
+				<button
+					className="db-nav-item db-nav-item--action"
+					style={roleStyle}
+					onClick={() => setIsDriverModalOpen(true)}
+				>
+					<Truck size={18} className="db-nav-item-icon" />
+					<span>Daftar Jadi Pengemudi</span>
+				</button>
+			)}
+		</>
+	);
 
-      <nav className="dash-bottom-nav">
-        <button
-          className={`dash-bottom-nav-item ${activeNav === 'dashboard' ? 'dash-bottom-nav-item--active' : ''}`}
-          style={activeNav === 'dashboard' ? { color: config.color } : {}}
-          onClick={() => setActiveNav('dashboard')}
-        >
-          <LayoutDashboard size={22} />
-          <span>Dashboard</span>
-        </button>
-        <Link to="/products" className="dash-bottom-nav-item">
-          <Package size={22} />
-          <span>Produk</span>
-        </Link>
-        <Link to="/" className="dash-bottom-nav-item">
-          <Home size={22} />
-          <span>Beranda</span>
-        </Link>
-        <button className="dash-bottom-nav-item" onClick={handleLogout}>
-          <LogOut size={22} />
-          <span>Keluar</span>
-        </button>
-      </nav>
-    </div>
-  );
+	const renderSellerNav = () => (
+		<>
+			{navBtn("store", "Toko Saya", Store)}
+			{navBtn("products", "Produk Saya", Package)}
+			<button className="db-nav-item db-nav-item--disabled" style={roleStyle}>
+				<ClipboardList size={18} className="db-nav-item-icon" />
+				<span>Pesanan Masuk</span>
+			</button>
+			<button className="db-nav-item db-nav-item--disabled" style={roleStyle}>
+				<BarChart3 size={18} className="db-nav-item-icon" />
+				<span>Pendapatan Toko</span>
+			</button>
+			<div className="db-nav-divider" />
+			<Link to="/products" className="db-nav-item" style={roleStyle}>
+				<ShoppingBag size={18} className="db-nav-item-icon" />
+				<span>Lihat Katalog</span>
+			</Link>
+		</>
+	);
+
+	const renderDriverNav = () => (
+		<>
+			{navBtn("driver_dash", "Dashboard Kurir", Truck)}
+			<button className="db-nav-item db-nav-item--disabled" style={roleStyle}>
+				<Package size={18} className="db-nav-item-icon" />
+				<span>Cari Pekerjaan</span>
+			</button>
+			<button className="db-nav-item db-nav-item--disabled" style={roleStyle}>
+				<ClipboardList size={18} className="db-nav-item-icon" />
+				<span>Riwayat Perjalanan</span>
+			</button>
+			<button className="db-nav-item db-nav-item--disabled" style={roleStyle}>
+				<Wallet size={18} className="db-nav-item-icon" />
+				<span>Pendapatan Kurir</span>
+			</button>
+		</>
+	);
+
+	const renderAdminNav = () => (
+		<>
+			{navBtn("akun", "Akun Saya", User)}
+			<button className="db-nav-item db-nav-item--disabled" style={roleStyle}>
+				<BarChart3 size={18} className="db-nav-item-icon" />
+				<span>Monitoring Pasar</span>
+			</button>
+			<button className="db-nav-item db-nav-item--disabled" style={roleStyle}>
+				<Shield size={18} className="db-nav-item-icon" />
+				<span>Kontrol Keamanan</span>
+			</button>
+		</>
+	);
+
+	const renderContent = () => {
+		switch (activeTab) {
+			case "akun":
+			case "dasbor":
+				return (
+					<AccountOverview
+						onRoleSwitched={(newRole) => setActiveTab(getDefaultTab(newRole))}
+						onOpenSellerModal={() => setIsSellerModalOpen(true)}
+						onOpenDriverModal={() => setIsDriverModalOpen(true)}
+						onOpenProfile={() => setActiveTab("profile")}
+					/>
+				);
+
+			case "store":
+				return <StoreManager onStoreLoaded={handleStoreLoaded} />;
+
+			case "profile":
+				return <PersonalProfile />;
+
+			case "products":
+				return (
+					<ProductManager
+						hasStore={hasStore}
+						onGoToStore={() => setActiveTab("store")}
+					/>
+				);
+
+			case "driver_dash":
+				return (
+					<div className="db-driver-card">
+						<div className="db-driver-header">
+							<div className="db-driver-icon">
+								<Truck size={28} />
+							</div>
+							<div>
+								<div className="db-driver-name">
+									{driverDetails?.fullName ?? user.username}
+								</div>
+								<span className="db-driver-status">Aktif</span>
+							</div>
+						</div>
+						<div className="db-driver-detail-grid">
+							<div className="db-driver-detail-item">
+								<div className="db-driver-detail-label">Nama Lengkap</div>
+								<div className="db-driver-detail-value">
+									{driverDetails?.fullName ?? "—"}
+								</div>
+							</div>
+							<div className="db-driver-detail-item">
+								<div className="db-driver-detail-label">Nomor Kendaraan</div>
+								<div className="db-driver-detail-value">
+									{driverDetails?.vehicleNumber ?? "—"}
+								</div>
+							</div>
+							<div className="db-driver-detail-item">
+								<div className="db-driver-detail-label">Status</div>
+								<div className="db-driver-detail-value">Aktif</div>
+							</div>
+							<div className="db-driver-detail-item">
+								<div className="db-driver-detail-label">Tanggal Registrasi</div>
+								<div className="db-driver-detail-value">
+									{driverDetails?.registeredAt
+										? new Date(driverDetails.registeredAt).toLocaleDateString(
+												"id-ID",
+												{
+													day: "numeric",
+													month: "long",
+													year: "numeric",
+												},
+											)
+										: "—"}
+								</div>
+							</div>
+						</div>
+					</div>
+				);
+
+			default:
+				return null;
+		}
+	};
+
+	const roleNavMap: Record<string, () => React.ReactNode> = {
+		Buyer: renderBuyerNav,
+		Seller: renderSellerNav,
+		Driver: renderDriverNav,
+		Admin: renderAdminNav,
+	};
+	const renderRoleNav = roleNavMap[user.activeRole] ?? renderBuyerNav;
+
+	const mobileTabs: {
+		tab: ViewTab;
+		label: string;
+		icon: React.FC<{ size?: number }>;
+	}[] =
+		user.activeRole === "Seller"
+			? [
+					{ tab: "store", label: "Toko", icon: Store },
+					{ tab: "products", label: "Produk", icon: Package },
+					{ tab: "akun", label: "Akun", icon: User },
+				]
+			: user.activeRole === "Driver"
+				? [
+						{ tab: "driver_dash", label: "Kurir", icon: Truck },
+						{ tab: "akun", label: "Akun", icon: User },
+					]
+				: [
+						{ tab: "dasbor", label: "Dasbor", icon: ShoppingBag },
+						{ tab: "akun", label: "Akun", icon: User },
+					];
+
+	return (
+		<div className="db-layout">
+			<aside className="db-sidebar">
+				<div className="db-user-block">
+					<div className="db-avatar-row">
+						<AvatarFallback
+							name={user.username}
+							size={42}
+							style={{ border: `2px solid ${config.color}40` }}
+						/>
+						<div>
+							<div className="db-user-name">{user.username}</div>
+							<span
+								className="db-role-badge"
+								style={{ backgroundColor: config.light, color: config.color }}
+							>
+								{config.label}
+							</span>
+							{user.activeRole === "Seller" && storeName && (
+								<div className="db-store-name-row">
+									<Store size={12} />
+									<span>{storeName}</span>
+								</div>
+							)}
+						</div>
+					</div>
+					{user.roles.length > 1 && (
+						<button
+							className="db-switch-role-btn"
+							onClick={() => setIsRoleModalOpen(true)}
+						>
+							<RefreshCw size={12} />
+							Ganti Peran
+						</button>
+					)}
+				</div>
+
+				<nav className="db-nav-section">{renderRoleNav()}</nav>
+
+				<div className="db-sidebar-footer">
+					<div className="db-nav-divider" />
+					<button
+						className="db-nav-item db-nav-item--logout"
+						onClick={handleLogout}
+					>
+						<LogOut size={18} className="db-nav-item-icon" />
+						<span>Keluar</span>
+					</button>
+				</div>
+			</aside>
+
+			<main className="db-content">
+				{getViewTitle(activeTab) && (
+					<h1 className="db-content-title">{getViewTitle(activeTab)}</h1>
+				)}
+				{renderContent()}
+			</main>
+
+			<nav className="db-bottom-nav">
+				{mobileTabs.map(({ tab, label, icon: Icon }) => (
+					<button
+						key={tab}
+						className={`db-bottom-nav-item${activeTab === tab ? " db-bottom-nav-item--active" : ""}`}
+						style={activeTab === tab ? { color: config.color } : {}}
+						onClick={() => setActiveTab(tab)}
+					>
+						<Icon size={22} />
+						<span>{label}</span>
+					</button>
+				))}
+				<button className="db-bottom-nav-item" onClick={handleLogout}>
+					<LogOut size={22} />
+					<span>Keluar</span>
+				</button>
+			</nav>
+
+			<BecomeSellerModal
+				isOpen={isSellerModalOpen}
+				onClose={() => setIsSellerModalOpen(false)}
+				onSubmit={handleSellerSubmit}
+			/>
+			<BecomeDriverModal
+				isOpen={isDriverModalOpen}
+				onClose={() => setIsDriverModalOpen(false)}
+				onSubmit={handleDriverSubmit}
+			/>
+			<RoleModal
+				isOpen={isRoleModalOpen}
+				onClose={() => setIsRoleModalOpen(false)}
+				roles={user.roles}
+				currentRole={user.activeRole}
+				onSelectRole={handleRoleSwitch}
+			/>
+		</div>
+	);
 };
 
 export default Dashboard;

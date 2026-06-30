@@ -99,9 +99,7 @@ export default function LandingPage() {
 	return (
 		<>
 			{!isMobile && (
-				<div
-					className="snap-dots"
-					aria-hidden>
+				<div className="snap-dots" aria-hidden>
 					{SECTIONS.map((s, i) => (
 						<button
 							key={s}
@@ -114,9 +112,7 @@ export default function LandingPage() {
 			)}
 
 			{!isMobile && activeSection === 0 && (
-				<div
-					className="snap-scroll-hint"
-					aria-hidden>
+				<div className="snap-scroll-hint" aria-hidden>
 					<div className="snap-scroll-icon">
 						<div className="snap-scroll-wheel" />
 					</div>
@@ -124,30 +120,20 @@ export default function LandingPage() {
 				</div>
 			)}
 
-			<div
-				className="snap-container"
-				ref={containerRef}>
-				<div
-					className="snap-section"
-					data-section="hero">
+			<div className="snap-container" ref={containerRef}>
+				<div className="snap-section" data-section="hero">
 					<HeroSection />
 				</div>
 
-				<div
-					className="snap-section"
-					data-section="how-it-works">
+				<div className="snap-section" data-section="how-it-works">
 					<HowItWorks />
 				</div>
 
-				<div
-					className="snap-section"
-					data-section="products">
+				<div className="snap-section" data-section="products">
 					<FeaturedProducts />
 				</div>
 
-				<div
-					className="snap-section"
-					data-section="cta">
+				<div className="snap-section" data-section="cta">
 					<FooterCTA />
 				</div>
 			</div>

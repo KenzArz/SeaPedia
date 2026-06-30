@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, User, LogOut, RefreshCw, Package } from "lucide-react";
+import { Menu, X, LogOut, RefreshCw, Package } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import Button from "./Button";
 import RoleModal from "./RoleModal";
+import AvatarFallback from "./AvatarFallback";
 import "../styles/Navbar.css";
 
 const roleColors: Record<string, string> = {
@@ -75,9 +76,7 @@ export const Navbar: React.FC = () => {
 		<>
 			<nav className={`site-navbar ${!isVisible ? "navbar-hidden" : ""}`}>
 				<div className="navbar-inner">
-					<Link
-						to="/"
-						className="navbar-brand">
+					<Link to="/" className="navbar-brand">
 						<span className="navbar-wave">🌊</span>
 						<span className="navbar-brand-text">SEAPEDIA</span>
 					</Link>
@@ -85,23 +84,27 @@ export const Navbar: React.FC = () => {
 					<div className="navbar-desktop-links">
 						<Link
 							to="/#hero"
-							className={`navbar-link ${isActive("/") || location.hash === "#hero" ? "navbar-link-active" : ""}`}>
+							className={`navbar-link ${isActive("/") || location.hash === "#hero" ? "navbar-link-active" : ""}`}
+						>
 							Beranda
 						</Link>
 						<Link
 							to="/products"
-							className={`navbar-link ${isActive("/products") ? "navbar-link-active" : ""}`}>
+							className={`navbar-link ${isActive("/products") ? "navbar-link-active" : ""}`}
+						>
 							Produk
 						</Link>
 						<Link
 							to="/reviews"
-							className={`navbar-link ${isActive("/reviews") ? "navbar-link-active" : ""}`}>
+							className={`navbar-link ${isActive("/reviews") ? "navbar-link-active" : ""}`}
+						>
 							Ulasan
 						</Link>
 						{user && (
 							<Link
-								to="/dashboard"
-								className={`navbar-link ${isActive("/dashboard") ? "navbar-link-active" : ""}`}>
+								to="/account"
+								className={`navbar-link ${isActive("/account") || location.pathname.startsWith("/dashboard") ? "navbar-link-active" : ""}`}
+							>
 								Dashboard
 							</Link>
 						)}
@@ -116,21 +119,27 @@ export const Navbar: React.FC = () => {
 										color: accentColor,
 										backgroundColor: accentColor + "15",
 										borderColor: accentColor + "30",
-									}}>
+									}}
+								>
 									{user.activeRole}
 								</div>
 
 								{user.roles.length > 1 && (
 									<button
 										className="navbar-switch-btn"
-										onClick={() => setIsRoleModalOpen(true)}>
+										onClick={() => setIsRoleModalOpen(true)}
+									>
 										<RefreshCw size={14} />
 										<span>Ganti Peran</span>
 									</button>
 								)}
 
 								<div className="navbar-user-badge">
-									<User size={15} />
+									<AvatarFallback
+										name={user.username}
+										size={28}
+										style={{ flexShrink: 0 }}
+									/>
 									<span>{user.username}</span>
 								</div>
 
@@ -138,7 +147,8 @@ export const Navbar: React.FC = () => {
 									variant="outline"
 									size="sm"
 									onClick={handleLogout}
-									className="navbar-logout-btn">
+									className="navbar-logout-btn"
+								>
 									<LogOut size={14} />
 									Keluar
 								</Button>
@@ -146,9 +156,7 @@ export const Navbar: React.FC = () => {
 						) : (
 							<div className="navbar-auth-btns">
 								<Link to="/login">
-									<Button
-										variant="text"
-										size="sm">
+									<Button variant="text" size="sm">
 										Masuk
 									</Button>
 								</Link>
@@ -162,7 +170,8 @@ export const Navbar: React.FC = () => {
 					<button
 						className="navbar-mobile-toggle"
 						onClick={() => setIsMobileOpen(!isMobileOpen)}
-						aria-label="Toggle navigation menu">
+						aria-label="Toggle navigation menu"
+					>
 						{isMobileOpen ? <X size={22} /> : <Menu size={22} />}
 					</button>
 				</div>
@@ -172,32 +181,36 @@ export const Navbar: React.FC = () => {
 						<Link
 							to="/#hero"
 							className="mobile-link"
-							onClick={() => setIsMobileOpen(false)}>
+							onClick={() => setIsMobileOpen(false)}
+						>
 							Beranda
 						</Link>
 						<Link
 							to="/products"
 							className="mobile-link"
-							onClick={() => setIsMobileOpen(false)}>
+							onClick={() => setIsMobileOpen(false)}
+						>
 							<Package size={16} /> Produk
 						</Link>
 						<Link
 							to="/reviews"
 							className="mobile-link"
-							onClick={() => setIsMobileOpen(false)}>
+							onClick={() => setIsMobileOpen(false)}
+						>
 							Ulasan
 						</Link>
 						{user ? (
 							<>
 								<Link
-									to="/dashboard"
+									to="/account"
 									className="mobile-link"
-									onClick={() => setIsMobileOpen(false)}>
+									onClick={() => setIsMobileOpen(false)}
+								>
 									Dashboard
 								</Link>
 								<div className="mobile-user-section">
 									<div className="mobile-user-info">
-										<User size={16} />
+										<AvatarFallback name={user.username} size={28} />
 										<span>{user.username}</span>
 										<div
 											className="navbar-role-chip"
@@ -205,7 +218,8 @@ export const Navbar: React.FC = () => {
 												color: accentColor,
 												backgroundColor: accentColor + "15",
 												borderColor: accentColor + "30",
-											}}>
+											}}
+										>
 											{user.activeRole}
 										</div>
 									</div>
@@ -215,31 +229,24 @@ export const Navbar: React.FC = () => {
 											onClick={() => {
 												setIsRoleModalOpen(true);
 												setIsMobileOpen(false);
-											}}>
+											}}
+										>
 											<RefreshCw size={14} /> Ganti Peran Aktif
 										</button>
 									)}
-									<button
-										className="mobile-logout-btn"
-										onClick={handleLogout}>
+									<button className="mobile-logout-btn" onClick={handleLogout}>
 										<LogOut size={15} /> Keluar
 									</button>
 								</div>
 							</>
 						) : (
 							<div className="mobile-auth-section">
-								<Link
-									to="/login"
-									onClick={() => setIsMobileOpen(false)}>
-									<Button
-										variant="outline"
-										className="w-full">
+								<Link to="/login" onClick={() => setIsMobileOpen(false)}>
+									<Button variant="outline" className="w-full">
 										Masuk
 									</Button>
 								</Link>
-								<Link
-									to="/register"
-									onClick={() => setIsMobileOpen(false)}>
+								<Link to="/register" onClick={() => setIsMobileOpen(false)}>
 									<Button className="w-full">Daftar Akun</Button>
 								</Link>
 							</div>
@@ -257,7 +264,7 @@ export const Navbar: React.FC = () => {
 					onSelectRole={async (role) => {
 						try {
 							await switchRole(role);
-							navigate("/dashboard");
+							navigate("/account");
 						} catch (err) {
 							console.error(err);
 						}

@@ -1,0 +1,323 @@
+/* ═══════════════════════════════════════════════════════════
+   /account — Role Hub Page
+   ═══════════════════════════════════════════════════════════ */
+
+.ac-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+/* ── Page header ─────────────────────────────────────────── */
+.ac-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ac-user-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.ac-user-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ac-username {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.ac-joindate {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+.ac-profile-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 5px 12px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-card);
+  transition: all var(--t-fast) var(--ease);
+  flex-shrink: 0;
+}
+.ac-profile-link:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+/* Redirect notice from RoleGuard */
+.ac-redirect-notice {
+  font-size: 13px;
+  font-weight: 500;
+  color: #92400e;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  border-radius: var(--r-sm);
+  padding: 10px 14px;
+}
+
+/* ── Section heading ─────────────────────────────────────── */
+.ac-section-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+.ac-section-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+/* ── Role cards grid ─────────────────────────────────────── */
+.ac-role-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+@media (max-width: 640px) {
+  .ac-role-grid { grid-template-columns: 1fr; }
+}
+
+/* Base card */
+.ac-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 16px 20px;
+  border-radius: 14px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-card);
+  text-align: center;
+  transition: box-shadow var(--t-fast) var(--ease);
+}
+
+/* STATE A — Active */
+.ac-card--active {
+  border: 2px solid var(--primary);
+  background: #eef2ff;
+  box-shadow: 0 0 0 3px rgba(79,70,229,0.08);
+}
+.ac-card-icon--active {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+/* STATE B — Owned */
+.ac-card--owned {
+  border-color: var(--border-strong);
+}
+.ac-card--owned:hover { box-shadow: var(--shadow-sm); }
+.ac-card-icon--owned {
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+}
+
+/* STATE C — Unregistered */
+.ac-card--unregistered {
+  border-color: var(--border);
+  background: #fafafa;
+}
+.ac-card-icon--unregistered {
+  background: #f3f4f6;
+  color: #9ca3af;
+  opacity: 0.7;
+}
+
+/* Card icon wrapper */
+.ac-card-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Card body */
+.ac-card-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.ac-card-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Badges */
+.ac-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: var(--r-pill);
+  letter-spacing: 0.02em;
+}
+.ac-badge--using {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+.ac-badge--owned {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+.ac-badge--none {
+  background: #f9fafb;
+  color: #9ca3af;
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* Buttons — each card has exactly ONE */
+.ac-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 9px 16px;
+  border-radius: var(--r-sm);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+}
+.ac-btn--primary {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+}
+.ac-btn--primary:hover { background: var(--primary-hover); }
+
+.ac-btn--outline {
+  background: transparent;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+}
+.ac-btn--outline:hover { background: var(--primary-light); }
+.ac-btn--outline:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.ac-btn--ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border-strong);
+}
+.ac-btn--ghost:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+.ac-spinner {
+  animation: spin 0.9s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Boat SVG illustration ───────────────────────────────── */
+.ac-boat-wrap {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+  width: 100%;
+  max-width: 520px;
+  overflow: hidden;
+}
+.ac-boat-svg {
+  width: 100%;
+  max-width: 520px;
+  filter: drop-shadow(0 0 28px rgba(59,130,246,0.18));
+  opacity: 0.88;
+  display: block;
+}
+
+/* Re-use the same animations from FooterCTA */
+.ac-ocean-wave {
+  animation: ctaOceanSway 4s infinite ease-in-out;
+}
+.ac-wave-d1 { animation-delay: 0.6s; }
+.ac-wave-d2 { animation-delay: 1.2s; }
+@keyframes ctaOceanSway {
+  0%, 100% { transform: translateX(0); opacity: 1; }
+  50%       { transform: translateX(-8px); opacity: 0.8; }
+}
+.ac-sail {
+  animation: ctaSailFlap 3s infinite ease-in-out;
+  transform-origin: 175px 108px;
+}
+@keyframes ctaSailFlap {
+  0%, 100% { transform: scaleX(1); }
+  50%       { transform: scaleX(0.85); }
+}
+.ac-antenna-dot {
+  animation: ctaAntennaPulse 2s infinite ease-in-out;
+}
+@keyframes ctaAntennaPulse {
+  0%, 100% { r: 2.5; opacity: 0.8; }
+  50%       { r: 4;   opacity: 1;   }
+}
+.ac-fish {
+  animation: ctaFishSwim 5s infinite ease-in-out;
+}
+@keyframes ctaFishSwim {
+  0%, 100% { transform: translate(42px, 60px) rotate(-15deg); }
+  50%       { transform: translate(58px, 55px) rotate(-10deg); }
+}
+.ac-net-line {
+  animation: ctaNetFade 3s infinite ease-in-out;
+}
+@keyframes ctaNetFade {
+  0%, 100% { opacity: 0.2; stroke-dashoffset: 0;   }
+  50%       { opacity: 0.5; stroke-dashoffset: -12; }
+}
+.ac-bubble { animation: ctaBubbleFloat 4s infinite ease-in-out; }
+.ac-bubble-1 { animation-delay: 0s;    }
+.ac-bubble-2 { animation-delay: 1.3s;  }
+.ac-bubble-3 { animation-delay: 2.6s;  }
+@keyframes ctaBubbleFloat {
+  0%, 100% { transform: translateY(0);   opacity: 0.25; }
+  50%       { transform: translateY(-8px); opacity: 0.5;  }
+}
+.ac-network-node {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pulseNode 3s infinite ease-in-out;
+}
+.ac-network-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pulseRing 3s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+@keyframes pulseNode {
+  0%, 100% { transform: scale(1);   opacity: 0.9; }
+  50%       { transform: scale(1.2); opacity: 1;   }
+}
+@keyframes pulseRing {
+  0%   { transform: scale(0.5); opacity: 0.8; }
+  100% { transform: scale(1.6); opacity: 0;   }
+}
+.ac-node-d1, .ac-ring-d1 { animation-delay: 0s;   }
+.ac-node-d2, .ac-ring-d2 { animation-delay: 0.6s; }
+.ac-node-d3, .ac-ring-d3 { animation-delay: 1.2s; }
+

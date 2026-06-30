@@ -1,18 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Store, ArrowRight } from 'lucide-react';
-import { dummyProducts } from '../../pages/ProductList';
-import { SEAFOOD_IMAGES } from '../../utils/imageHelper';
+import { Store, ArrowRight, Loader } from 'lucide-react';
+import { productService } from '../../services/productService';
+import { getProductImage, SEAFOOD_IMAGES } from '../../utils/imageHelper';
 import "../../styles/FeaturedProducts.css";
 
-const categories = ['Semua', 'Ikan Segar', 'Udang & Kepiting', 'Kerang & Moluska'];
+interface ApiProduct {
+  _id: string;
+  name: string;
+  price: number;
+  stock: number;
+  description: string;
+  image?: string;
+  store?: {
+    _id: string;
+    name: string;
+    description?: string;
+  };
+}
 
 export const FeaturedProducts: React.FC = () => {
-  const [activeCategory, setActiveCategory] = useState('Semua');
+  const [products, setProducts] = useState<ApiProduct[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filtered = activeCategory === 'Semua'
-    ? dummyProducts.slice(0, 8)
-    : dummyProducts.filter(p => p.category === activeCategory).slice(0, 8);
+  useEffect(() => {
+    const controller = new AbortController();
+    const fetchFeatured = async () => {
+      try {
+        setLoading(true);
+        const res = await productService.getAllProducts({ limit: 8 });
+        setProducts(res.data.data || []);
+      } catch (err) {
+        console.error('Error fetching featured products:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFeatured();
+    return () => controller.abort();
+  }, []);
 
   return (
     <section className="fp-section">
@@ -28,54 +54,54 @@ export const FeaturedProducts: React.FC = () => {
           </Link>
         </div>
 
-        <div className="fp-pills anim-fade-up-d2">
-          {categories.map(cat => (
-            <button
-              key={cat}
-              className={`fp-pill ${activeCategory === cat ? 'fp-pill--active' : ''}`}
-              onClick={() => setActiveCategory(cat)}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        <div className="fp-grid">
-          {filtered.map((prod, idx) => (
-            <Link to={`/products/${prod.id}`} key={prod.id} className="fp-card-link">
-              <article className="fp-card">
-                <div className="fp-card-img-wrap">
-                  <img
-                    src={prod.image || SEAFOOD_IMAGES[idx % SEAFOOD_IMAGES.length]}
-                    alt={prod.name}
-                    className="fp-card-img"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        SEAFOOD_IMAGES[idx % SEAFOOD_IMAGES.length];
-                    }}
-                  />
-                  <span className="fp-card-cat">{prod.category}</span>
-                </div>
-                <div className="fp-card-body">
-                  <p className="fp-card-store">
-                    <Store size={11} />
-                    {prod.storeName}
-                  </p>
-                  <h3 className="fp-card-name">{prod.name}</h3>
-                  <div className="fp-card-footer">
-                    <span className="fp-card-price">
-                      Rp {prod.price.toLocaleString('id-ID')}
-                      <span className="fp-card-unit">/kg</span>
-                    </span>
-                    <span className={`fp-stock-dot fp-stock-${
-                      prod.stock > 20 ? 'high' : prod.stock > 5 ? 'med' : 'low'
-                    }`} title={`Stok: ${prod.stock}kg`} />
+        {loading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '40px 0' }}>
+            <Loader className="animate-spin" size={24} style={{ color: '#4F46E5' }} />
+          </div>
+        ) : products.length === 0 ? (
+          <p style={{ textAlign: 'center', color: '#94a3b8', padding: '40px 0' }}>Belum ada produk tersedia</p>
+        ) : (
+          <div className="fp-grid">
+            {products.map((prod, idx) => (
+              <Link to={`/products/${prod._id}`} key={prod._id} className="fp-card-link">
+                <article className="fp-card">
+                  <div className="fp-card-img-wrap">
+                    <img
+                      src={getProductImage(prod.image, idx)}
+                      alt={prod.name}
+                      className="fp-card-img"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          SEAFOOD_IMAGES[idx % SEAFOOD_IMAGES.length];
+                      }}
+                    />
                   </div>
-                </div>
-              </article>
-            </Link>
-          ))}
-        </div>
+                  <div className="fp-card-body">
+                    {prod.store && (
+                      <p className="fp-card-store">
+                        <Store size={11} />
+                        {prod.store.name}
+                      </p>
+                    )}
+                    <h3 className="fp-card-name">{prod.name}</h3>
+                    <div className="fp-card-footer">
+                      <span className="fp-card-price">
+                        {new Intl.NumberFormat('id-ID', {
+                          style: 'currency',
+                          currency: 'IDR',
+                          maximumFractionDigits: 0
+                        }).format(prod.price)}
+                      </span>
+                      <span className={`fp-stock-dot fp-stock-${
+                        prod.stock > 20 ? 'high' : prod.stock > 5 ? 'med' : 'low'
+                      }`} title={`Stok: ${prod.stock} unit`} />
+                    </div>
+                  </div>
+                </article>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

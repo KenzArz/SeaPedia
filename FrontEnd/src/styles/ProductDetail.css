@@ -1,3 +1,70 @@
+/* ── Loading / Error states ── */
+.pdp-loading-state {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  min-height: 60vh; gap: 16px;
+  color: #94a3b8;
+}
+.pdp-spinner { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.pdp-error-state {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 12px;
+  padding: 80px 24px;
+  color: #e11d48;
+  text-align: center;
+}
+
+/* ── Store inline badge ── */
+.pdp-store-inline-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 700;
+  color: #94a3b8;
+  background: #f8fafc;
+  padding: 4px 10px; border-radius: 20px;
+  margin-bottom: 12px;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+.pdp-store-inline-badge:hover { color: #4F46E5; background: #eef2ff; }
+
+/* ── Divider ── */
+.pdp-divider {
+  border: none;
+  height: 1px;
+  background: #e2e8f0;
+  margin: 20px 0;
+}
+
+/* ── Stock row ── */
+.pdp-stock-row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 14px; font-weight: 600;
+  margin-bottom: 24px;
+}
+.pdp-stock-label { color: #94a3b8; }
+.pdp-stock-val { font-weight: 800; }
+.pdp-stock-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-left: 2px;
+}
+
+/* ── Store card link ── */
+.pdp-store-card--link {
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+.pdp-store-card--link:hover { box-shadow: 0 2px 12px rgba(79,70,229,0.12); }
+.pdp-store-desc-small {
+  font-size: 12px; color: #94a3b8;
+  margin: 4px 0 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .pdp-page {
   padding: 48px 24px;
 }
